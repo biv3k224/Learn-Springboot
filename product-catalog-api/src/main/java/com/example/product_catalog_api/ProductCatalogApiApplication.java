@@ -1,13 +1,13 @@
-package com.example.demo;
+package com.example.product_catalog_api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class HelloApiServiceApplication {
+public class ProductCatalogApiApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(HelloApiServiceApplication.class, args);
+		SpringApplication.run(ProductCatalogApiApplication.class, args);
 	}
 
 }
