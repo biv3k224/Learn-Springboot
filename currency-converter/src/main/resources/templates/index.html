@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1><i class="fas fa-money-bill-wave"></i> Currency Converter</h1>
+        <p class="subtitle">Real-time exchange rates powered by Frankfurter API</p>
+    </header>
+
+    <div class="converter-card">
+        <div class="converter-form">
+            <div class="input-group">
+                <div class="input-box">
+                    <label for="amount"><i class="fas fa-coins"></i> Amount</label>
+                    <input type="number" id="amount" value="100" min="0.01" step="0.01" placeholder="Enter amount">
+                </div>
+
+                <div class="currency-selectors">
+                    <div class="currency-box">
+                        <label for="fromCurrency"><i class="fas fa-arrow-right"></i> From</label>
+                        <div class="select-wrapper">
+                            <select id="fromCurrency">
+                                <!-- Currencies will be loaded dynamically -->
+                            </select>
+                            <div class="select-arrow">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swap-button">
+                        <button id="swapCurrencies" title="Swap currencies">
+                            <i class="fas fa-exchange-alt"></i>
+                        </button>
+                    </div>
+
+                    <div class="currency-box">
+                        <label for="toCurrency"><i class="fas fa-arrow-left"></i> To</label>
+                        <div class="select-wrapper">
+                            <select id="toCurrency">
+                                <!-- Currencies will be loaded dynamically -->
+                            </select>
+                            <div class="select-arrow">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="convertBtn" class="convert-btn">
+                <i class="fas fa-sync-alt"></i> Convert Currency
+            </button>
+        </div>
+
+        <div class="result-section" id="resultSection" style="display: none;">
+            <div class="result-card">
+                <div class="result-header">
+                    <h3><i class="fas fa-chart-line"></i> Conversion Result</h3>
+                    <span class="timestamp" id="timestamp"></span>
+                </div>
+
+                <div class="result-content">
+                    <div class="amount-display">
+                        <div class="original-amount">
+                            <span class="currency-code" id="fromCode">USD</span>
+                            <span class="amount" id="originalAmount">100.00</span>
+                        </div>
+                        <div class="conversion-arrow">
+                            <i class="fas fa-long-arrow-alt-right"></i>
+                        </div>
+                        <div class="converted-amount">
+                            <span class="currency-code" id="toCode">EUR</span>
+                            <span class="amount" id="convertedAmount">0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="exchange-rate">
+                        <p><i class="fas fa-percentage"></i> Exchange Rate:
+                            <span id="exchangeRate">0.00</span>
+                        </p>
+                        <p class="rate-info">1 <span id="fromRateCode">USD</span> =
+                            <span id="rateValue">0.00</span> <span id="toRateCode">EUR</span>
+                        </p>
+                    </div>
+
+                    <div class="details">
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fas fa-calendar"></i> Last Updated:</span>
+                            <span class="detail-value" id="lastUpdated">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label"><i class="fas fa-database"></i> Source:</span>
+                            <span class="detail-value">Frankfurter API</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Converting currency...</p>
+        </div>
+
+        <div class="error-message" id="errorMessage" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p id="errorText"></p>
+        </div>
+    </div>
+
+    <div class="popular-conversions">
+        <h3><i class="fas fa-bolt"></i> Quick Conversions</h3>
+        <div class="quick-buttons" id="quickButtons">
+            <!-- Quick conversion buttons will be added dynamically -->
+        </div>
+    </div>
+
+    <footer>
+        <p>Currency Converter API v1.0 | Built with Spring Boot & Frankfurter API</p>
+        <p class="api-status">
+            <i class="fas fa-circle" id="apiStatusIcon"></i>
+            <span id="apiStatusText">Checking API status...</span>
+        </p>
+    </footer>
+</div>
+
+<script src="/js/script.js"></script>
+</body>
+</html>

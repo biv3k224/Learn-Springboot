@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration API Dashboard</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #4cc9f0;
+            --light-bg: #f8f9fa;
+            --dark-bg: #212529;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--primary-color) !important;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .api-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .status-up {
+            background-color: rgba(76, 201, 240, 0.2);
+            color: #4cc9f0;
+        }
+
+        .status-down {
+            background-color: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        .user-card {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+
+        .response-box {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+
+        footer {
+            margin-top: 50px;
+            padding: 20px 0;
+            background-color: rgba(0,0,0,0.05);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .endpoint {
+            background-color: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="bi bi-person-badge me-2"></i>
+            User Registration API
+        </a>
+        <div class="d-flex align-items-center">
+            <span class="me-3">API Status: <span id="apiStatus" class="api-status status-up">Checking...</span></span>
+            <span class="me-3">DB Status: <span id="dbStatus" class="api-status">Checking...</span></span>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h1 class="display-6">User Registration API Dashboard</h1>
+                    <p class="lead">Test and visualize the Spring Boot User Registration API with Validation & Exception Handling</p>
+                    <div class="row mt-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h3 id="totalUsers">0</h3>
+                                    <p>Total Users</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h3 id="activeEndpoints">8</h3>
+                                    <p>API Endpoints</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h3 id="validations">6</h3>
+                                    <p>Validations</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h3 id="exceptions">4</h3>
+                                    <p>Exception Types</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column: User Registration Form -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-person-plus me-2"></i>Register New User
+                </div>
+                <div class="card-body">
+                    <form id="registerForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">Username *</label>
+                                <input type="text" class="form-control" id="username"
+                                       placeholder="john_doe" required>
+                                <div class="form-text">3-50 chars, letters, numbers, underscores</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email"
+                                       placeholder="john@example.com" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password *</label>
+                            <input type="password" class="form-control" id="password"
+                                   placeholder="Password@123" required>
+                            <div class="form-text">Min 8 chars with digit, lowercase, uppercase, special char</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name *</label>
+                            <input type="text" class="form-control" id="fullName"
+                                   placeholder="John Doe" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phoneNumber" class="form-label">Phone Number</label>
+                                <input type="text" class="form-control" id="phoneNumber"
+                                       placeholder="+1234567890">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="age" class="form-label">Age *</label>
+                                <input type="number" class="form-control" id="age"
+                                       placeholder="25" min="18" max="150" required>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send me-2"></i>Register User
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="fillSampleData()">
+                                <i class="bi bi-magic me-2"></i>Fill Sample Data
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- API Response Display -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <i class="bi bi-code-slash me-2"></i>API Response
+                </div>
+                <div class="card-body">
+                    <div id="apiResponse" class="response-box">
+                        Response will appear here...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: User List & Actions -->
+        <div class="col-md-6">
+            <!-- User List -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-people me-2"></i>Registered Users</span>
+                    <button class="btn btn-sm btn-outline-primary" onclick="loadUsers()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="userList">
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-people display-4"></i>
+                            <p class="mt-2">No users found. Register a user to get started!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-lightning me-2"></i>Quick Actions
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-success w-100" onclick="testValidUser()">
+                                <i class="bi bi-check-circle me-2"></i>Test Valid User
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-danger w-100" onclick="testInvalidUser()">
+                                <i class="bi bi-x-circle me-2"></i>Test Validation
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-warning w-100" onclick="testDuplicateUser()">
+                                <i class="bi bi-exclamation-triangle me-2"></i>Test Duplicate
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-info w-100" onclick="testNotFound()">
+                                <i class="bi bi-search me-2"></i>Test Not Found
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Endpoints -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-list-check me-2"></i>Available Endpoints
+                </div>
+                <div class="card-body">
+                    <div class="endpoint">POST /api/users/register</div>
+                    <div class="endpoint">GET  /api/users</div>
+                    <div class="endpoint">GET  /api/users/{id}</div>
+                    <div class="endpoint">GET  /api/users/username/{username}</div>
+                    <div class="endpoint">GET  /api/users/email/{email}</div>
+                    <div class="endpoint">PUT  /api/users/{id}</div>
+                    <div class="endpoint">DELETE /api/users/{id}</div>
+                    <div class="endpoint">GET  /api/test/db</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center">
+        <p class="mb-0">Spring Boot User Registration API with Validation & Exception Handling</p>
+        <p class="text-muted small">Built with Spring Boot, PostgreSQL, Docker, and Bootstrap</p>
+    </footer>
+</div>
+
+<!-- JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // API Base URL
+    const API_BASE_URL = 'http://localhost:8080/api';
+
+    // Check API status on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        checkApiStatus();
+        checkDbStatus();
+        loadUsers();
+    });
+
+    // Check if API is running
+    async function checkApiStatus() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/test/ping`);
+            if (response.ok) {
+                document.getElementById('apiStatus').className = 'api-status status-up';
+                document.getElementById('apiStatus').textContent = 'UP';
+            } else {
+                document.getElementById('apiStatus').className = 'api-status status-down';
+                document.getElementById('apiStatus').textContent = 'DOWN';
+            }
+        } catch (error) {
+            document.getElementById('apiStatus').className = 'api-status status-down';
+            document.getElementById('apiStatus').textContent = 'DOWN';
+        }
+    }
+
+    // Check database connection
+    async function checkDbStatus() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/test/db`);
+            if (response.ok) {
+                document.getElementById('dbStatus').className = 'api-status status-up';
+                document.getElementById('dbStatus').textContent = 'CONNECTED';
+            } else {
+                document.getElementById('dbStatus').className = 'api-status status-down';
+                document.getElementById('dbStatus').textContent = 'DISCONNECTED';
+            }
+        } catch (error) {
+            document.getElementById('dbStatus').className = 'api-status status-down';
+            document.getElementById('dbStatus').textContent = 'DISCONNECTED';
+        }
+    }
+
+    // Load all users
+    async function loadUsers() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users`);
+            const users = await response.json();
+
+            const userList = document.getElementById('userList');
+            const totalUsers = document.getElementById('totalUsers');
+
+            totalUsers.textContent = users.length;
+
+            if (users.length === 0) {
+                userList.innerHTML = `
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-people display-4"></i>
+                            <p class="mt-2">No users found. Register a user to get started!</p>
+                        </div>
+                    `;
+                return;
+            }
+
+            let html = '<div class="row">';
+            users.forEach(user => {
+                html += `
+                        <div class="col-md-6 mb-3">
+                            <div class="card user-card">
+                                <div class="card-body">
+                                    <h6 class="card-title">${user.fullName}</h6>
+                                    <p class="card-text small mb-1">
+                                        <i class="bi bi-person me-1"></i> ${user.username}
+                                    </p>
+                                    <p class="card-text small mb-1">
+                                        <i class="bi bi-envelope me-1"></i> ${user.email}
+                                    </p>
+                                    <p class="card-text small mb-2">
+                                        <i class="bi bi-calendar me-1"></i> Age: ${user.age}
+                                    </p>
+                                    <div class="d-flex justify-content-between">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="getUserById(${user.id})">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(${user.id})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+            });
+            html += '</div>';
+            userList.innerHTML = html;
+
+        } catch (error) {
+            showResponse('Error loading users: ' + error.message, 'error');
+        }
+    }
+
+    // Handle form submission
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const userData = {
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+            fullName: document.getElementById('fullName').value,
+            phoneNumber: document.getElementById('phoneNumber').value || null,
+            age: parseInt(document.getElementById('age').value)
+        };
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                showResponse(JSON.stringify(result, null, 2), 'success');
+                loadUsers();
+                clearForm();
+            } else {
+                showResponse(JSON.stringify(result, null, 2), 'error');
+            }
+        } catch (error) {
+            showResponse('Error: ' + error.message, 'error');
+        }
+    });
+
+    // Get user by ID
+    async function getUserById(id) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${id}`);
+            const result = await response.json();
+            showResponse(JSON.stringify(result, null, 2), response.ok ? 'success' : 'error');
+        } catch (error) {
+            showResponse('Error: ' + error.message, 'error');
+        }
+    }
+
+    // Delete user
+    async function deleteUser(id) {
+        if (!confirm('Are you sure you want to delete this user?')) return;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                showResponse('User deleted successfully!', 'success');
+                loadUsers();
+            } else {
+                const error = await response.json();
+                showResponse(JSON.stringify(error, null, 2), 'error');
+            }
+        } catch (error) {
+            showResponse('Error: ' + error.message, 'error');
+        }
+    }
+
+    // Test functions
+    function testValidUser() {
+        document.getElementById('username').value = 'test_user_' + Date.now();
+        document.getElementById('email').value = 'test' + Date.now() + '@example.com';
+        document.getElementById('password').value = 'Test@1234';
+        document.getElementById('fullName').value = 'Test User';
+        document.getElementById('phoneNumber').value = '+1234567890';
+        document.getElementById('age').value = 25;
+        showResponse('Sample valid data filled. Click "Register User" to test.', 'info');
+    }
+
+    function testInvalidUser() {
+        document.getElementById('username').value = 'ab';  // Too short
+        document.getElementById('email').value = 'invalid-email';
+        document.getElementById('password').value = '123';
+        document.getElementById('fullName').value = '';
+        document.getElementById('age').value = 15;  // Too young
+        showResponse('Invalid data filled. Click "Register User" to test validation errors.', 'warning');
+    }
+
+    async function testDuplicateUser() {
+        // First get existing users to find a duplicate
+        try {
+            const response = await fetch(`${API_BASE_URL}/users`);
+            const users = await response.json();
+
+            if (users.length > 0) {
+                const existingUser = users[0];
+                document.getElementById('username').value = existingUser.username;
+                document.getElementById('email').value = existingUser.email;
+                document.getElementById('password').value = 'Test@1234';
+                document.getElementById('fullName').value = 'Duplicate User';
+                document.getElementById('age').value = 30;
+                showResponse('Duplicate data filled. Click "Register User" to test duplicate exception.', 'warning');
+            } else {
+                showResponse('No existing users found. Register a user first.', 'info');
+            }
+        } catch (error) {
+            showResponse('Error: ' + error.message, 'error');
+        }
+    }
+
+    async function testNotFound() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/999999`);
+            const result = await response.json();
+            showResponse(JSON.stringify(result, null, 2), 'error');
+        } catch (error) {
+            showResponse('Error: ' + error.message, 'error');
+        }
+    }
+
+    function fillSampleData() {
+        document.getElementById('username').value = 'john_doe';
+        document.getElementById('email').value = 'john@example.com';
+        document.getElementById('password').value = 'Password@123';
+        document.getElementById('fullName').value = 'John Doe';
+        document.getElementById('phoneNumber').value = '+1234567890';
+        document.getElementById('age').value = 25;
+        showResponse('Sample data filled. Click "Register User" to test.', 'info');
+    }
+
+    // Clear form
+    function clearForm() {
+        document.getElementById('registerForm').reset();
+    }
+
+    // Show response in the response box
+    function showResponse(message, type = 'info') {
+        const responseBox = document.getElementById('apiResponse');
+        responseBox.textContent = message;
+
+        // Remove existing color classes
+        responseBox.classList.remove('text-success', 'text-danger', 'text-warning', 'text-info');
+
+        // Add appropriate color class
+        switch(type) {
+            case 'success':
+                responseBox.classList.add('text-success');
+                break;
+            case 'error':
+                responseBox.classList.add('text-danger');
+                break;
+            case 'warning':
+                responseBox.classList.add('text-warning');
+                break;
+            case 'info':
+                responseBox.classList.add('text-info');
+                break;
+        }
+
+        // Scroll to response box
+        responseBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+</script>
+</body>
+</html>
